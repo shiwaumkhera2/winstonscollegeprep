@@ -9,14 +9,15 @@ export const site = {
   subheadline: 'Expert preparation for SAT, ACT, IELTS, TOEFL, GRE, GMAT, and IB',
   description:
     'Expert preparation for SAT, ACT, IELTS, TOEFL, GRE, GMAT, and IB. Personalized tutoring and admissions coaching from Winston College Prep.',
-  url: 'https://winstoncollegeprep.net',
+  /** Deployed origin (+ base path, no trailing slash). Injected at build time — see vite.config.ts. */
+  url: (import.meta.env.VITE_SITE_URL ?? 'https://winstoncollegeprep.net').replace(/\/+$/, ''),
   email: 'wgaspardpe@gmail.com',
   phone: '+51 969 770 267',
   phoneHref: 'tel:+51969770267',
   whatsappHref: 'https://wa.me/51969770267',
   cta: 'Start Your Journey',
   ogImage: '/og-image.png',
-} as const
+}
 
 /** Portrait shown on the Contact page. Replace `public/portrait.jpg` to update it. */
 export const portrait = {

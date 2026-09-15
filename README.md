@@ -1,6 +1,6 @@
 # Winston College Prep — website
 
-Marketing site for [Winston College Prep](https://winstoncollegeprep.net) (also known as Winston Academy): tutoring, test preparation and admissions coaching.
+Marketing site for Winston College Prep (also known as Winston Academy), live at <https://shiwaumkhera2.github.io/winstonscollegeprep/> and destined for winstoncollegeprep.net: tutoring, test preparation and admissions coaching.
 
 Built as a fully static site so it can be hosted for free on **GitHub Pages**.
 
@@ -9,7 +9,7 @@ Built as a fully static site so it can be hosted for free on **GitHub Pages**.
 | Framework | [Vite](https://vite.dev) + [React](https://react.dev) + TypeScript |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com) |
 | Animation | [Framer Motion](https://motion.dev) |
-| Routing | [react-router-dom](https://reactrouter.com) (`BrowserRouter` + `404.html` fallback) |
+| Routing | [react-router-dom](https://reactrouter.com) (`BrowserRouter` with a `404.html` fallback for GitHub Pages) |
 | SEO | [react-helmet-async](https://github.com/staylor/react-helmet-async) |
 | Icons | [lucide-react](https://lucide.dev) |
 | Fonts | Playfair Display (headlines) and DM Sans (body and UI), loaded from Google Fonts |
@@ -29,7 +29,7 @@ Other scripts:
 
 ```bash
 npm run build      # type-check, then build to dist/
-npm run preview    # serve dist/ locally, exactly as GitHub Pages will
+npm run preview    # serve dist/ at http://localhost:4173/winstonscollegeprep/, exactly as Pages will
 npm run typecheck  # TypeScript only
 ```
 
@@ -41,11 +41,9 @@ To test the contact form locally with a real form service, copy `.env.example` t
 
 ```
 public/                 Static files copied to the site root as-is
-  CNAME                 Custom domain for GitHub Pages
   gallery/              Gallery photos (placeholders for now)
   logos/                Course logos (placeholders for now)
-  portrait-placeholder.svg
-  favicon.svg, og-image.*, robots.txt, sitemap.xml
+  portrait.jpg, favicon.svg, og-image.png, apple-touch-icon.png
 src/
   config.ts             Business details: name, tagline, email, phone, WhatsApp, form endpoint
   data/
@@ -144,36 +142,42 @@ Linking to `/contact?course=<slug>` preselects a course in the dropdown; the cou
 
 ## Deployment
 
-The site deploys automatically to GitHub Pages from the `main` branch.
+The site deploys automatically to GitHub Pages from the `main` branch via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). It is live at <https://shiwaumkhera2.github.io/winstonscollegeprep/>.
 
-### One-time setup
+### How the base path works
 
-1. Push this folder to a GitHub repository (`main` branch).
-2. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Push (or re-run the workflow under **Actions**). The workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) installs dependencies, runs `npm run build` and publishes `dist/`.
+A project site lives under `/winstonscollegeprep/`, so every asset URL has to carry that prefix. The workflow reads the repository's Pages settings with `actions/configure-pages` and passes two values into the build:
 
-### Custom domain
+| Variable | Project URL (today) | After a custom domain is set |
+| --- | --- | --- |
+| `VITE_BASE_PATH` | `/winstonscollegeprep/` | `/` |
+| `VITE_SITE_URL` | `https://shiwaumkhera2.github.io/winstonscollegeprep` | `https://winstoncollegeprep.net` |
 
-`public/CNAME` contains `winstoncollegeprep.net`, so Pages will serve the site there once DNS points at GitHub:
+Vite uses the base path for all bundled assets, `index.html` links use `%BASE_URL%`, and every image in the data files goes through `asset()` in [`src/lib/asset.ts`](src/lib/asset.ts), which prefixes `import.meta.env.BASE_URL`. The site URL feeds canonical links, Open Graph tags, and the generated `sitemap.xml` and `robots.txt`. Nothing has to change in code when the domain changes.
 
-- `A` records for the apex domain → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-- `CNAME` record for `www` → `<your-github-username>.github.io`
+Local builds default to the project URL values, so `npm run build && npm run preview` serves the site at `http://localhost:4173/winstonscollegeprep/`, exactly as Pages will.
 
-Then, under **Settings → Pages**, confirm the custom domain and tick **Enforce HTTPS**.
+### Custom domain (winstoncollegeprep.net)
 
-### Base path
+With a GitHub Actions deployment, a `CNAME` file in the build is ignored, so the domain is configured in the repository instead:
 
-With the custom domain (or a `<user>.github.io` root repository) the site lives at `/`, which is the default. If you deploy to a project URL such as `https://<user>.github.io/<repo>/` **without** a custom domain, set the repository variable `VITE_BASE_PATH` to `/<repo>/` (**Settings → Secrets and variables → Actions → Variables**). Vite, the router and all asset paths read from it.
+1. Point DNS at GitHub Pages:
+   - `A` records for the apex domain → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `CNAME` record for `www` → `shiwaumkhera2.github.io`
+2. In the repository, open **Settings → Pages**, enter the custom domain, and save. Tick **Enforce HTTPS** once the certificate is issued.
+3. Re-run the deploy workflow (or push). `configure-pages` now reports an empty base path and the custom domain, and the build switches automatically.
 
-### Form service in production
+### Client-side routing on Pages
 
-Add `VITE_FORM_ENDPOINT` (and `VITE_WEB3FORMS_KEY` if using Web3Forms) as repository **variables** in the same place. The workflow passes them to the build.
+GitHub Pages only knows about real files, so a hard refresh on `/winstonscollegeprep/services` would normally return its 404 page. The build copies `index.html` to `404.html`, so Pages serves the app shell for any unknown path and react-router renders the right page.
 
-### How client-side routing works on Pages
+### Contact form in production
 
-GitHub Pages only knows about real files, so a hard refresh on `/services` would normally return its 404 page. The build copies `index.html` to `404.html`, so Pages serves the app shell for any unknown path and react-router renders the right page. Deep links and refreshes therefore work everywhere.
+Add `VITE_FORM_ENDPOINT` (and `VITE_WEB3FORMS_KEY` if using Web3Forms) as repository **variables** under **Settings → Secrets and variables → Actions → Variables**. The workflow passes them to the build.
 
----
+### Keep a single deploy workflow
+
+GitHub's "Deploy static content to Pages" starter workflow uploads the raw repository instead of `dist/`. Only `deploy.yml` should exist in `.github/workflows/`; a second Pages workflow will race with it and can publish the wrong files.
 
 ## Accessibility and motion
 

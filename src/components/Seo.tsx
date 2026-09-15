@@ -15,7 +15,7 @@ interface SeoProps {
 export function Seo({ title, description = site.description, path = '/', image = site.ogImage }: SeoProps) {
   const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline}`
   const url = `${site.url}${path === '/' ? '/' : path}`
-  const imageUrl = image.startsWith('http') ? image : `${site.url}${image}`
+  const imageUrl = image.startsWith('http') ? image : `${site.url}/${image.replace(/^\/+/, '')}`
 
   return (
     <Helmet>
