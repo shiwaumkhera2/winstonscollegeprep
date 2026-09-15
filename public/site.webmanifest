@@ -1,0 +1,10 @@
+{
+  "name": "Winston College Prep",
+  "short_name": "Winston Prep",
+  "description": "Expert preparation for SAT, ACT, IELTS, TOEFL, GRE, GMAT, and IB.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

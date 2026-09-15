@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Playfair Display', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+
+  /* Deep backgrounds, footer, dark band */
+  --color-navy-950: #0a1128;
+  --color-navy-900: #0f1c3f;
+  --color-navy-800: #142457;
+
+  /* Primary buttons, headings, accents */
+  --color-royal-700: #1e3a8a;
+  --color-royal-600: #2447b8;
+  --color-royal-500: #2f5be0;
+
+  /* Highlights, hover states, light surfaces */
+  --color-sky-400: #4f8ef7;
+  --color-sky-300: #7fb0ff;
+  --color-ice-100: #e8f0fe;
+  --color-ice-50: #f4f7fd;
+
+  /* Neutrals */
+  --color-slate-100: #f1f4f9;
+  --color-slate-200: #e2e7f0;
+
+  /* Text greys tinted toward navy so every neutral belongs to the same family */
+  --color-ink-700: #2a3553;
+  --color-ink-600: #4a5675;
+  --color-ink-500: #6b7694;
+  --color-ink-400: #8f98b3;
+
+  --radius-card: 4px;
+
+  --shadow-card: 0 1px 0 0 rgb(15 28 63 / 0.03), 0 10px 30px -18px rgb(47 91 224 / 0.15);
+  --shadow-card-hover: 0 20px 50px rgb(47 91 224 / 0.18);
+  --shadow-glow: 0 18px 44px -10px rgb(47 91 224 / 0.5);
+
+  --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    @apply bg-white font-sans text-ink-600 antialiased;
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-medium text-navy-900;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--color-ice-100);
+    color: var(--color-navy-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sky-400);
+    outline-offset: 3px;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Page-width container used by every section. */
+@utility container-x {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 84rem;
+  padding-inline: 1.25rem;
+
+  @media (min-width: 640px) {
+    padding-inline: 2.5rem;
+  }
+
+  @media (min-width: 1280px) {
+    padding-inline: 3rem;
+  }
+}
+
+/* The one accent gradient: royal-600 → sky-400. */
+@utility bg-accent-gradient {
+  background-image: linear-gradient(135deg, var(--color-royal-600), var(--color-sky-400));
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(135deg, var(--color-royal-600), var(--color-sky-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Same gradient, lifted a step so it stays legible on navy. */
+@utility text-gradient-light {
+  background-image: linear-gradient(135deg, var(--color-royal-500), var(--color-sky-400) 55%, var(--color-sky-300));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Faint answer-sheet dot grid for light surfaces. */
+@utility dot-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgb(15 28 63 / 0.1) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+@utility dot-grid-light {
+  background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.1) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* Paper grain. The pseudo-element paints beneath any `relative` child. */
+@utility grain {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: multiply;
+    background-size: 240px 240px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Custom chevron for native <select> elements (appearance: none removes the browser's). */
+@utility select-chevron {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%236b7694' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  background-position: right 1rem center;
+}
